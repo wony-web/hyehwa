@@ -112,14 +112,15 @@
       border-radius: 12px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
       object-fit: contain;
-      cursor: zoom-in;
-      transition: max-width 0.3s, max-height 0.3s;
+      cursor: grab;
+      user-select: none;
+      transform-origin: center center;
     }
 
-    #lightbox-img.zoomed {
-      max-width: 100%;
-      max-height: none;
-      cursor: zoom-out;
+    #zoom-hint {
+      color: rgba(255,255,255,0.4);
+      font-size: 0.78rem;
+      margin-top: 6px;
     }
 
     #lightbox-counter {
@@ -269,6 +270,7 @@
   <div id="lightbox-inner">
     <img id="lightbox-img" src="" alt="">
     <div id="lightbox-counter"></div>
+    <div id="zoom-hint">🔍 스크롤로 확대/축소 · 드래그로 이동 · 더블클릭으로 초기화</div>
     <div class="reactions" id="reactions"></div>
     <div class="comments-section">
       <h3>💬 댓글</h3>
@@ -350,6 +352,7 @@
 
   function navigate(dir) {
     clearListeners();
+    resetZoom();
     current = (current + dir + total) % total;
     document.getElementById('lightbox-img').src = `${current + 1}.jpg`;
     document.getElementById('lightbox-counter').textContent = `${current + 1} / ${total}`;
@@ -357,10 +360,49 @@
     loadComments(current);
   }
 
-  document.getElementById('lightbox-img').addEventListener('click', e => {
-    e.stopPropagation();
-    e.currentTarget.classList.toggle('zoomed');
+  // 확대/축소 & 드래그
+  const lbImgEl = document.getElementById('lightbox-img');
+  let scale = 1, tx = 0, ty = 0;
+  let dragging = false, dragStartX = 0, dragStartY = 0;
+
+  function applyTransform() {
+    lbImgEl.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    lbImgEl.style.cursor = scale > 1 ? (dragging ? 'grabbing' : 'grab') : 'grab';
+  }
+
+  function resetZoom() {
+    scale = 1; tx = 0; ty = 0;
+    applyTransform();
+  }
+
+  lbImgEl.addEventListener('wheel', e => {
+    e.preventDefault();
+    scale = Math.min(4, Math.max(1, scale + (e.deltaY < 0 ? 0.2 : -0.2)));
+    if (scale === 1) { tx = 0; ty = 0; }
+    applyTransform();
+  }, { passive: false });
+
+  lbImgEl.addEventListener('mousedown', e => {
+    e.preventDefault();
+    dragging = true;
+    dragStartX = e.clientX - tx;
+    dragStartY = e.clientY - ty;
+    lbImgEl.style.cursor = 'grabbing';
   });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    tx = e.clientX - dragStartX;
+    ty = e.clientY - dragStartY;
+    applyTransform();
+  });
+
+  document.addEventListener('mouseup', () => {
+    dragging = false;
+    applyTransform();
+  });
+
+  lbImgEl.addEventListener('dblclick', resetZoom);
 
   document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
   document.getElementById('lightbox-prev').addEventListener('click', e => { e.stopPropagation(); navigate(-1); });
