@@ -3,32 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>사진 갤러리</title>
+  <title>언어채집 사례</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #f5f5f5;
+      background: #fff5f8;
       font-family: 'Segoe UI', sans-serif;
     }
 
     header {
-      background: #3b82f6;
-      color: white;
+      background: linear-gradient(135deg, #ffb7c5, #ffd6e0, #ffecd2);
+      color: #8b2252;
       text-align: center;
-      padding: 24px 16px;
+      padding: 28px 16px;
     }
 
-    header h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-    }
-
-    header p {
-      margin-top: 6px;
-      font-size: 0.95rem;
-      opacity: 0.85;
-    }
+    header h1 { font-size: 1.8rem; font-weight: 700; }
+    header p  { margin-top: 8px; font-size: 0.95rem; opacity: 0.75; }
 
     .grid {
       display: grid;
@@ -39,19 +31,23 @@
       margin: 0 auto;
     }
 
-    .grid img {
+    .thumb-wrap {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .thumb-wrap img {
       width: 100%;
       aspect-ratio: 1 / 1;
       object-fit: cover;
-      border-radius: 10px;
-      cursor: pointer;
+      border-radius: 12px;
       transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      box-shadow: 0 2px 8px rgba(255, 100, 150, 0.15);
     }
 
-    .grid img:hover {
+    .thumb-wrap:hover img {
       transform: scale(1.04);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 20px rgba(255, 100, 150, 0.3);
     }
 
     /* 라이트박스 */
@@ -61,67 +57,195 @@
       inset: 0;
       background: rgba(0,0,0,0.88);
       z-index: 999;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      overflow-y: auto;
     }
 
-    #lightbox.active {
+    #lightbox.active { display: block; }
+
+    #lightbox-inner {
+      min-height: 100vh;
       display: flex;
-    }
-
-    #lightbox img {
-      max-width: 92vw;
-      max-height: 80vh;
-      border-radius: 10px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
-
-    #lightbox-counter {
-      color: white;
-      margin-top: 14px;
-      font-size: 1rem;
-      opacity: 0.8;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px 60px;
     }
 
     #lightbox-close {
-      position: absolute;
-      top: 18px;
-      right: 22px;
+      position: fixed;
+      top: 16px; right: 20px;
       color: white;
-      font-size: 2rem;
+      font-size: 2.5rem;
       cursor: pointer;
+      z-index: 1001;
       line-height: 1;
       opacity: 0.8;
     }
-
     #lightbox-close:hover { opacity: 1; }
 
-    #lightbox-prev,
-    #lightbox-next {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
+    #lightbox-nav {
+      position: fixed;
+      top: 50%; transform: translateY(-50%);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    #lightbox-nav button {
+      pointer-events: all;
       background: rgba(255,255,255,0.15);
       color: white;
       border: none;
-      font-size: 2rem;
-      padding: 10px 18px;
+      font-size: 2.5rem;
+      padding: 8px 16px;
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.2s;
     }
+    #lightbox-nav button:hover { background: rgba(255,255,255,0.3); }
 
-    #lightbox-prev { left: 14px; }
-    #lightbox-next { right: 14px; }
-    #lightbox-prev:hover,
-    #lightbox-next:hover { background: rgba(255,255,255,0.3); }
+    #lightbox-img {
+      max-width: min(90vw, 680px);
+      max-height: 52vh;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      object-fit: contain;
+    }
+
+    #lightbox-counter {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+
+    /* 반응 버튼 */
+    .reactions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .reaction-btn {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 30px;
+      padding: 8px 18px;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .reaction-btn:hover {
+      background: rgba(255,255,255,0.25);
+      transform: scale(1.1);
+    }
+
+    .reaction-btn.pop {
+      background: rgba(255, 182, 200, 0.45);
+      border-color: #ffb7c5;
+      transform: scale(1.15);
+    }
+
+    .reaction-btn .count {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    /* 댓글 */
+    .comments-section {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 24px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .comments-section h3 {
+      color: #ffd6e0;
+      font-size: 1rem;
+      margin-bottom: 14px;
+    }
+
+    #comments-list {
+      max-height: 220px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .comment-item {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      color: white;
+    }
+
+    .comment-name {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #ffb7c5;
+      margin-bottom: 4px;
+    }
+
+    .comment-text { font-size: 0.95rem; }
+
+    .no-comments {
+      color: rgba(255,255,255,0.35);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 18px 0;
+    }
+
+    .comment-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .comment-form input,
+    .comment-form textarea {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: white;
+      font-size: 0.95rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .comment-form input::placeholder,
+    .comment-form textarea::placeholder { color: rgba(255,255,255,0.35); }
+
+    .comment-form textarea { resize: none; height: 80px; }
+
+    .comment-form button {
+      background: linear-gradient(135deg, #ffb7c5, #ff7aaa);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 11px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .comment-form button:hover { opacity: 0.85; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>📷 사진 갤러리</h1>
+  <h1>🌸 언어채집 사례</h1>
   <p>사진을 클릭하면 크게 볼 수 있어요</p>
 </header>
 
@@ -130,64 +254,182 @@
 <!-- 라이트박스 -->
 <div id="lightbox">
   <span id="lightbox-close">&times;</span>
-  <button id="lightbox-prev">&#8249;</button>
-  <img id="lightbox-img" src="" alt="">
-  <div id="lightbox-counter"></div>
-  <button id="lightbox-next">&#8250;</button>
+  <div id="lightbox-nav">
+    <button id="lightbox-prev">&#8249;</button>
+    <button id="lightbox-next">&#8250;</button>
+  </div>
+  <div id="lightbox-inner">
+    <img id="lightbox-img" src="" alt="">
+    <div id="lightbox-counter"></div>
+    <div class="reactions" id="reactions"></div>
+    <div class="comments-section">
+      <h3>💬 댓글</h3>
+      <div id="comments-list"></div>
+      <div class="comment-form">
+        <input type="text" id="comment-name" placeholder="이름 (예: 3반 김민준)">
+        <textarea id="comment-text" placeholder="이 사진에 대한 생각을 적어주세요!"></textarea>
+        <button id="comment-submit">댓글 등록</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<script>
-  const total = 18;
-  const images = Array.from({ length: total }, (_, i) => `${i + 1}.jpg`);
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-  const grid = document.getElementById('grid');
-  images.forEach((src, idx) => {
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = `사진 ${idx + 1}`;
-    img.addEventListener('click', () => openLightbox(idx));
-    grid.appendChild(img);
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyAD0zSSLGmUKHS0_GH1SHHALWrCJ2fUi94",
+    authDomain: "wony-6729a.firebaseapp.com",
+    databaseURL: "https://wony-6729a-default-rtdb.firebaseio.com",
+    projectId: "wony-6729a",
+    storageBucket: "wony-6729a.firebasestorage.app",
+    messagingSenderId: "455260997772",
+    appId: "1:455260997772:web:724388cb319e71209e13a9"
   });
 
-  let current = 0;
-  const lightbox = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lightbox-img');
-  const lbCounter = document.getElementById('lightbox-counter');
+  const db = firebase.database();
 
+  const total = 18;
+  const EMOJIS = [
+    { key: 'heart', emoji: '❤️',  label: '좋아요' },
+    { key: 'wow',   emoji: '😲',  label: '신기해요' },
+    { key: 'think', emoji: '🤔',  label: '생각해요' },
+    { key: 'great', emoji: '👏',  label: '멋져요' },
+  ];
+
+  let current = 0;
+  let reactionUnsubs = [];
+  let commentUnsub = null;
+
+  // 그리드 생성
+  const grid = document.getElementById('grid');
+  for (let i = 0; i < total; i++) {
+    const wrap = document.createElement('div');
+    wrap.className = 'thumb-wrap';
+    const img = document.createElement('img');
+    img.src = `${i + 1}.jpg`;
+    img.alt = `사진 ${i + 1}`;
+    img.addEventListener('click', () => openLightbox(i));
+    wrap.appendChild(img);
+    grid.appendChild(wrap);
+  }
+
+  // 라이트박스
   function openLightbox(idx) {
     current = idx;
-    lbImg.src = images[current];
-    lbCounter.textContent = `${current + 1} / ${total}`;
-    lightbox.classList.add('active');
+    document.getElementById('lightbox-img').src = `${current + 1}.jpg`;
+    document.getElementById('lightbox-counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    loadReactions(current);
+    loadComments(current);
   }
 
   function closeLightbox() {
-    lightbox.classList.remove('active');
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+    clearListeners();
+  }
+
+  function clearListeners() {
+    reactionUnsubs.forEach(fn => fn());
+    reactionUnsubs = [];
+    if (commentUnsub) { commentUnsub(); commentUnsub = null; }
+  }
+
+  function navigate(dir) {
+    clearListeners();
+    current = (current + dir + total) % total;
+    document.getElementById('lightbox-img').src = `${current + 1}.jpg`;
+    document.getElementById('lightbox-counter').textContent = `${current + 1} / ${total}`;
+    loadReactions(current);
+    loadComments(current);
   }
 
   document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-
-  document.getElementById('lightbox-prev').addEventListener('click', e => {
-    e.stopPropagation();
-    current = (current - 1 + total) % total;
-    lbImg.src = images[current];
-    lbCounter.textContent = `${current + 1} / ${total}`;
-  });
-
-  document.getElementById('lightbox-next').addEventListener('click', e => {
-    e.stopPropagation();
-    current = (current + 1) % total;
-    lbImg.src = images[current];
-    lbCounter.textContent = `${current + 1} / ${total}`;
-  });
+  document.getElementById('lightbox-prev').addEventListener('click', e => { e.stopPropagation(); navigate(-1); });
+  document.getElementById('lightbox-next').addEventListener('click', e => { e.stopPropagation(); navigate(1); });
 
   document.addEventListener('keydown', e => {
-    if (!lightbox.classList.contains('active')) return;
+    if (!document.getElementById('lightbox').classList.contains('active')) return;
     if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') document.getElementById('lightbox-prev').click();
-    if (e.key === 'ArrowRight') document.getElementById('lightbox-next').click();
+    if (e.key === 'ArrowLeft') navigate(-1);
+    if (e.key === 'ArrowRight') navigate(1);
   });
+
+  // 반응 로드
+  function loadReactions(idx) {
+    const container = document.getElementById('reactions');
+    container.innerHTML = '';
+
+    EMOJIS.forEach(({ key, emoji, label }) => {
+      const btn = document.createElement('button');
+      btn.className = 'reaction-btn';
+      btn.title = label;
+      btn.innerHTML = `<span>${emoji}</span><span class="count">0</span>`;
+
+      const ref = db.ref(`reactions/photo_${idx + 1}/${key}`);
+      const handler = snap => {
+        btn.querySelector('.count').textContent = snap.val() || 0;
+      };
+      ref.on('value', handler);
+      reactionUnsubs.push(() => ref.off('value', handler));
+
+      btn.addEventListener('click', () => {
+        ref.transaction(v => (v || 0) + 1);
+        btn.classList.add('pop');
+        setTimeout(() => btn.classList.remove('pop'), 400);
+      });
+
+      container.appendChild(btn);
+    });
+  }
+
+  // 댓글 로드
+  function loadComments(idx) {
+    const list = document.getElementById('comments-list');
+    list.innerHTML = '';
+
+    const ref = db.ref(`comments/photo_${idx + 1}`);
+    const handler = snap => {
+      list.innerHTML = '';
+      const data = snap.val();
+      if (!data) {
+        list.innerHTML = '<p class="no-comments">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</p>';
+        return;
+      }
+      Object.values(data)
+        .sort((a, b) => a.time - b.time)
+        .forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'comment-item';
+          div.innerHTML = `<div class="comment-name">${esc(item.name)}</div><div class="comment-text">${esc(item.text)}</div>`;
+          list.appendChild(div);
+        });
+      list.scrollTop = list.scrollHeight;
+    };
+    ref.on('value', handler);
+    commentUnsub = () => ref.off('value', handler);
+  }
+
+  // 댓글 등록
+  document.getElementById('comment-submit').addEventListener('click', () => {
+    const name = document.getElementById('comment-name').value.trim();
+    const text = document.getElementById('comment-text').value.trim();
+    if (!name || !text) { alert('이름과 댓글을 모두 입력해주세요!'); return; }
+    db.ref(`comments/photo_${current + 1}`).push({ name, text, time: Date.now() });
+    document.getElementById('comment-text').value = '';
+  });
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
 </script>
 
 </body>
