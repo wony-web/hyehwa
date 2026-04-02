@@ -112,6 +112,14 @@
       border-radius: 12px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
       object-fit: contain;
+      cursor: zoom-in;
+      transition: max-width 0.3s, max-height 0.3s;
+    }
+
+    #lightbox-img.zoomed {
+      max-width: 100%;
+      max-height: none;
+      cursor: zoom-out;
     }
 
     #lightbox-counter {
@@ -348,6 +356,11 @@
     loadReactions(current);
     loadComments(current);
   }
+
+  document.getElementById('lightbox-img').addEventListener('click', e => {
+    e.stopPropagation();
+    e.currentTarget.classList.toggle('zoomed');
+  });
 
   document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
   document.getElementById('lightbox-prev').addEventListener('click', e => { e.stopPropagation(); navigate(-1); });
